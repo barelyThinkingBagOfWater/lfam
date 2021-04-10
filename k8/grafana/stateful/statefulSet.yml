@@ -1,0 +1,39 @@
+    apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      name: grafana-server-statefulset
+      namespace: monitoring
+      labels: 
+        service: grafana
+    spec:
+      serviceName: grafana-service
+      replicas: 1
+      selector:
+        matchLabels:
+          app: grafana-server
+          service: grafana
+      template:
+        metadata:
+          labels:
+            app: grafana-server
+            service: grafana
+        spec:
+          containers:
+            - name: grafana
+              image: grafana/grafana:6.4.4
+              ports:
+                - containerPort: 3000
+              volumeMounts:
+                - name: grafana-volume
+                  mountPath: /var/lib/grafana/
+          volumes:
+          - name: grafana-volume
+            persistentVolumeClaim:
+              claimName: grafana-pvc
+          initContainers:
+          - name: grafana-fix-permissions-init-container
+            image: alpine:latest
+            command: ['sh', '-c', 'chown -R 472:472 /var/lib/grafana']
+            volumeMounts:
+            - name: grafana-volume
+              mountPath: /var/lib/grafana

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elastalert-deployment
+  namespace: logging
+  labels:
+   service: elk-elastalert
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: elk-elastalert
+  template:
+    metadata:
+      labels:
+        service: elk-elastalert
+    spec:
+      #serviceAccountName: elastalert
+      containers:
+      - name: elastalert
+        image: bitsensor/elastalert
+        volumeMounts:
+        - name: config
+          mountPath: /opt/config
+        - name: rules
+          mountPath: /opt/rules
+      volumes:
+        - name: rules
+          configMap:
+            name: elastalert-rules
+        - name: config
+          configMap:
+            name: elastalert-config

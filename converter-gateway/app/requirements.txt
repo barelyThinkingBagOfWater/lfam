@@ -1,0 +1,4 @@
+aiohttp
+aio_pika
+prometheus_client
+

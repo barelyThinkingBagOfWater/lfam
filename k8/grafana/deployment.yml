@@ -1,0 +1,56 @@
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: grafana-server
+      namespace: monitoring
+      labels: 
+        service: grafana
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: grafana-server
+          service: grafana
+      template:
+        metadata:
+          annotations:
+            prometheus.io/scrape: 'true'
+            prometheus.io/port: '3000'
+            prometheus.io/path: '/metrics'
+          labels:
+            app: grafana-server
+            service: grafana
+        spec:
+          containers:
+            - name: grafana
+              image: grafana/grafana:7.2.0
+              ports:
+                - containerPort: 3000
+              resources:
+                limits:
+                  memory: 256Mi
+                  cpu: 500m
+                requests:
+                  memory: 256Mi
+                  cpu: 250m
+              volumeMounts:
+              - mountPath: /var/lib/grafana
+                name: grafana-storage
+              - mountPath: /etc/grafana/provisioning/dashboards
+                name: grafana-provisioning-dashbaords-volume
+              - mountPath: /etc/grafana/provisioning/datasources
+                name: grafana-provisioning-datasources-volume
+              - mountPath: /etc/grafana/
+                name: custom-config-grafana-configmap-volume
+          volumes:
+          - name: grafana-storage
+            emptyDir: {}
+          - name: custom-config-grafana-configmap-volume
+            configMap:
+              name: custom-config-grafana-configmap
+          - name: grafana-provisioning-dashbaords-volume
+            configMap:
+              name: grafana-provisoned-dashboards-configmap
+          - name: grafana-provisioning-datasources-volume
+            configMap:
+              name: grafana-provisoned-datasources-configmap

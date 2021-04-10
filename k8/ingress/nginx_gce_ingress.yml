@@ -1,0 +1,60 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    certmanager.k8s.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+  - hosts:
+    - letsfindamovie.com
+    secretName: lfam-secret
+  rules:
+   - host: letsfindamovie.com
+     http:
+       paths:
+        - path: /api/tag/
+          pathType: Prefix
+          backend:
+            service:
+              name: cache-tags-manager-service
+              port:
+                number: 80
+        - path: /api/movies
+          pathType: Prefix
+          backend:
+            service:
+              name: cache-movies-manager-service
+              port:
+                number: 80
+        - path: /api/rating/
+          pathType: Prefix
+          backend:
+            service:
+              name: cache-ratings-manager-service
+              port:
+                number: 80
+        - path: /api/movie/
+          pathType: Prefix
+          backend:
+            service:
+              name: converter-gateway-service
+              port:
+                number: 80
+        - path: /api/grafana/
+          pathType: Prefix
+          backend:
+            service:
+              name: grafana-ingress-service
+              port:
+                number: 3000
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: webapp-service
+              port:
+                number: 80

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ssl-mongo-config
+data:
+  mongod.conf: |
+    security:
+      authorization: enabled
+    net:
+      tls:
+        mode: requireTLS
+        CAFile: /etc/ssl/root-ca.pem
+        certificateKeyFile: /etc/ssl/mongodb.pem
+        certificateKeyFilePassword: password

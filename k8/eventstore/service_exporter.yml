@@ -1,0 +1,14 @@
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: eventstore-prometheus-exporter-service
+      labels:
+        service: eventstore-prometheus-exporter
+    spec:
+      selector:
+        service: eventstore-prometheus-exporter
+      ports:
+      - port: 9448
+        name: http
+      type: ClusterIP
+

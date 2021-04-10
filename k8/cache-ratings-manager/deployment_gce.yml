@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cache-ratings-manager-deployment
+  labels:
+    service: cache-ratings-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: cache-ratings-manager
+  template:
+    metadata:
+      labels:
+        service: cache-ratings-manager
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: metrics
+        prometheus.io/port: '80'
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: security
+                operator: In
+                values:
+                - dmz
+      containers:
+      - name: cache-ratings-manager
+        image: xbarrelet/cache-ratings-manager
+        imagePullPolicy: Always
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 80
+          periodSeconds: 5
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        env:
+        - name: JAVA_OPTS
+          value: -XX:MaxRAMPercentage=75
+        - name: PLAY_HTTP_PORT
+          value: "80"
+        - name: EVENTSTORE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cache-ratings-manager-config
+              key: eventstore.host
+        - name: RABBITMQ_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cache-ratings-manager-config
+              key: rabbitmq.host
+        - name: MANAGER_RATINGS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cache-ratings-manager-config
+              key: manager.ratings.host
+        - name: RABBITMQ_USER
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-secrets
+              key: rabbit-user
+        - name: RABBITMQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-secrets
+              key: rabbit-password
+        - name: EVENTSTORE_USER
+          valueFrom:
+            secretKeyRef:
+              name: eventstore-secrets
+              key: eventstore-user
+        - name: EVENTSTORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: eventstore-secrets
+              key: eventstore-password
+        - name: EVENTSTORE_CLUSTER_NODES
+          valueFrom:
+            configMapKeyRef:
+              name: cache-ratings-manager-config
+              key: eventstore.cluster.nodes
+        - name: IMPORT_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              name: cache-ratings-manager-config
+              key: import.timeout
+        - name: REPOSITORY_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              name: cache-ratings-manager-config
+              key: repository.timeout

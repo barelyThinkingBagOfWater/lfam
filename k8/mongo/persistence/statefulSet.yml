@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-statefulset
+  namespace: internal
+  labels:
+    service: mongo
+spec:
+  serviceName: mongo-service 
+  replicas: 1
+  selector:
+    matchLabels:
+      service: mongo
+  template:
+    metadata:
+      labels:
+        service: mongo
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: security
+                operator: In
+                values:
+                - internal
+      containers:
+      - name: mongo
+        image: mongo:4
+        ports:
+        - containerPort: 27017
+          name: http
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: 250m
+            memory: 512Mi
+        volumeMounts:
+        - name: mongo-pvc 
+          mountPath: /data/db
+        - name: initscript-configmap-volume
+          mountPath: /docker-entrypoint-initdb.d/ 
+      volumes:
+      - name: initscript-configmap-volume
+        configMap:
+          name: initscript-configmap
+      initContainers:
+      - name: fix-the-volume-permission
+        image: busybox
+        command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /data/db
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: mongo-pvc
+          mountPath: /data/db
+          
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-pvc
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: manual
+      resources:
+        requests:
+          storage: 4Gi

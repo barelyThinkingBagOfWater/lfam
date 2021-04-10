@@ -1,0 +1,1 @@
+docker build -t mongo-prepared . && docker run --rm -d --name mongo-service --network isolatedNetwork -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=toor -e MONGO_INITDB_DATABASE=movies mongo-prepared

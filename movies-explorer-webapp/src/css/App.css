@@ -1,0 +1,77 @@
+.header {
+    background-color: rgb(83, 76, 75);
+}
+
+.link {
+    padding-left: 40px;
+    /* automatic justification would be better */
+}
+
+body {
+    font-weight: bold;
+    background-image: url("../resources/background.png");
+}
+
+.main-body {
+    padding-left: 20px;
+}
+
+.search-input-container {
+    padding: 10px 0;
+}
+
+::placeholder {
+    font-weight: bolder;
+}
+
+.search-input {
+    width: 450px;
+}
+
+.body-containers {
+    display: grid;
+    grid-template-columns: calc(100% / 3) auto;
+    grid-template-rows: auto auto auto;
+    grid-column-gap: 10px;
+    grid-row-gap: 30px;
+}
+
+.movies-list {
+    overflow: auto;
+}
+
+.tags-list {
+    margin-top: 50px;
+    /* border-top: 1px solid black; */
+    grid-column: 1 / 3;
+    /* border-bottom: 1px solid black; */
+    margin-bottom: 20px;
+}
+
+.movie {
+    padding-left: 10px;
+    /* border-left: 1px double black; */
+    font-weight: initial;
+}
+
+.rating {
+    font-size: 90%;
+}
+
+.movie-tags-list {
+    overflow: auto;
+    /* height: calc(100vh - 700px); */
+}
+
+.dashboard {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+/* FONTS */
+@font-face {
+    font-family: 'Yeon Sung';
+    font-style: cursive;
+    src: url('../resources/YeonSung-Regular.ttf') format('ttf'),
+}

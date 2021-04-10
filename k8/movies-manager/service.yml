@@ -1,0 +1,28 @@
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: movies-manager-service
+      namespace: internal
+      labels:
+        service: movies-manager
+    spec:
+      selector:
+        service: movies-manager
+      ports:
+      - port: 443 
+        name: https
+      clusterIP: None
+---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: movies-manager-from-dmz-service
+      labels:
+        service: movies-manager
+    spec:
+      ports:
+      - port: 443 
+        name: https
+      type: ExternalName
+      externalName: movies-manager-service.internal.svc.cluster.local
+

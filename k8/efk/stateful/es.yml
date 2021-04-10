@@ -1,0 +1,112 @@
+    kind: PersistentVolume
+    apiVersion: v1
+    metadata:
+      name: elk-es-pv
+      namespace: logging
+      labels:
+        type: local
+    spec:
+      storageClassName: manual
+      capacity:
+        storage: 1Gi
+      accessModes:
+        - ReadWriteOnce
+      hostPath:
+        path: "/data/efk/es"
+---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: elk-es-service
+      namespace: logging
+      labels:
+        service: elk-es
+    spec:
+      selector:
+        service: elk-es
+      ports:
+      - port: 9200
+        name: main
+      - port: 9300
+        name: node-to-node
+---
+    apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      name: elk-es-statefulset
+      namespace: logging
+      labels:
+        service: elk-es
+    spec:
+      serviceName: elk-es-service 
+      replicas: 1
+      selector:
+        matchLabels:
+          service: elk-es
+      template:
+        metadata:
+          labels:
+            service: elk-es
+        spec:
+          terminationGracePeriodSeconds: 300
+          containers:
+          - name: elasticsearch
+            image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.5.1
+            ports:
+            - containerPort: 9200
+              name: http
+            - containerPort: 9300
+              name: tcp
+            resources:
+              requests:
+                memory: 1Gi
+                cpu: 500m
+              limits:
+                cpu: 1500m
+                memory: 2Gi
+            env:
+              - name: cluster.name
+                value: elk-cluster
+              - name: discovery.type
+                value: single-node
+            volumeMounts:
+            - name: elk-es-pvc 
+              mountPath: /usr/share/elasticsearch/data
+          initContainers:
+          - name: fix-the-volume-permission
+            image: busybox
+            command:
+            - sh
+            - -c
+            - chown -R 1000:1000 /usr/share/elasticsearch/data
+            securityContext:
+              privileged: true
+            volumeMounts:
+            - name: elk-es-pvc
+              mountPath: /usr/share/elasticsearch/data
+          - name: increase-the-vm-max-map-count
+            image: busybox
+            command:
+            - sysctl
+            - -w
+            - vm.max_map_count=262144
+            securityContext:
+              privileged: true
+          - name: increase-the-ulimit
+            image: busybox
+            command:
+            - sh
+            - -c
+            - ulimit -n 65536
+            securityContext:
+              privileged: true
+      volumeClaimTemplates:
+      - metadata:
+          name: elk-es-pvc
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          storageClassName: manual
+          resources:
+            requests:
+              storage: 1Gi

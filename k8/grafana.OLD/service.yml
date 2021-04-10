@@ -1,0 +1,16 @@
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: grafana-service-nodeport
+      namespace: monitoring
+      labels:
+        service: grafana
+    spec:
+      selector:
+        service: grafana
+      ports:
+      - port: 3000 
+        name: http
+        nodePort: 30002
+      type: NodePort
+

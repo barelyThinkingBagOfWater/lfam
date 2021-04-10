@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movies-manager-deployment
+  namespace: internal
+  labels:
+    service: movies-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: movies-manager
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /actuator/prometheus
+        prometheus.io/port: '8080'
+      labels:
+        service: movies-manager
+    spec:
+      containers:
+      - name: movies-manager
+        image: xbarrelet/movies-manager
+        imagePullPolicy: Always
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 443
+            scheme: HTTPS
+          periodSeconds: 2
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 2500m
+            memory: 6Gi 
+          limits:
+            cpu: 2500m
+            memory: 6Gi
+        env:
+        - name: MANAGER_IMPORTS_LOGGING_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: movies-manager-config
+              key: imports.logging
+        - name: MONGODB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: movies-manager-config
+              key: mongodb.host
+        - name: MONGODB_NODES_NUMBER
+          valueFrom:
+            configMapKeyRef:
+              name: movies-manager-config
+              key: mongodb.nodes.number
+        - name: MONGODB_REPLICASET
+          valueFrom:
+            configMapKeyRef:
+              name: movies-manager-config
+              key: mongodb.replicaSet
+        - name: MONGODB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secrets
+              key: mongo-user
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secrets
+              key: mongo-password
+        - name: SPRING_RABBITMQ_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: movies-manager-config
+              key: spring.rabbitmq.host
+        - name: SPRING_RABBITMQ_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-secrets
+              key: rabbit-user
+        - name: SPRING_RABBITMQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-secrets
+              key: rabbit-password
+              

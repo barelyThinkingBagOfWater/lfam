@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eventstore-cluster
+spec:
+  selector:
+    matchLabels:
+      app: eventstore-cluster 
+  serviceName: eventstore-cluster
+  replicas: 3   #Needs to match EVENTSTORE_CLUSTER_SIZE
+  template:
+    metadata:
+      labels:
+        app: eventstore-cluster
+    spec:
+      containers:
+      - name: eventstore
+        image: eventstore/eventstore:release-4.1.1-hotfix1
+        env:
+        - name: EVENTSTORE_CLUSTER_SIZE #Must match the replica count, prevents autoscaling and there is no k8 operator available...
+          value: "3" 
+        - name: EVENTSTORE_DISCOVER_VIA_DNS
+          value: "true"
+        - name: EVENTSTORE_CLUSTER_DNS
+          value: "eventstore-cluster" #Will match our service name
+        - name: EVENTSTORE_EXT_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        ports: 
+        - containerPort: 2113
+          name: eventstore-web
+        - containerPort: 1113
+          name: eventstore-tcp
+        - containerPort: 2112
+          name: gossip
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 2113
+          initialDelaySeconds: 30
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 2113
+          initialDelaySeconds: 5
+          periodSeconds: 5

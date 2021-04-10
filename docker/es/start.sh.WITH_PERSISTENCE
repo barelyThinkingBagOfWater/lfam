@@ -1,0 +1,1 @@
+docker run --rm -d --name elastic -p 9200:9200 -p 9300:9300 --network isolatedNetwork -v /data/elastic/:/usr/share/elasticsearch/data -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.4.2 &

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cache-ratings-manager-config
+data:
+  manager.ratings.host: https://movies-manager-from-dmz-service
+  eventstore.host: eventstore-service
+  rabbitmq.host: rabbit-service
+  eventstore.cluster.nodes: ""
+  import.timeout: "20"
+  repository.timeout: "10"

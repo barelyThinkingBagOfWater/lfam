@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: internal
+  labels:
+    service: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: keycloak
+  template:
+    metadata:
+      labels:
+        service: keycloak
+    spec:
+      containers:
+      - name: keycloak
+        image: quay.io/keycloak/keycloak:11.0.3 #with provisioning 12.0.3 fails when loading theme
+        env:
+        - name: KEYCLOAK_USER
+          value: "admin"
+        - name: KEYCLOAK_PASSWORD
+          value: "admin"
+        - name: ROOT_LOGLEVEL
+          value: DEBUG
+        - name: PROXY_ADDRESS_FORWARDING
+          value: "true"
+        - name: DB_VENDOR
+          value: "h2"
+        - name: KEYCLOAK_IMPORT
+          value: /tmp/realm-export.json
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 8443
+        readinessProbe:
+          httpGet:
+            path: /auth/realms/master
+            port: 8080
+        volumeMounts:
+          - name: realm-import-volume
+            mountPath: /tmp/
+            
+      volumes:
+      - name: realm-import-volume
+        configMap:
+          name: realm-config-map      

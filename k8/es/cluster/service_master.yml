@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: es-master-service
+  labels:
+    service: elasticsearch-master
+spec:
+  selector:
+    service: elasticsearch-master
+  ports:
+  - port: 9200
+    name: main
+  - port: 9300
+    name: node-to-node
+  clusterIP: None

@@ -1,0 +1,41 @@
+version: '3.6'
+services:
+  elasticsearch_master:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.5.4 #-oss for not having xpack
+    container_name: elasticsearch_master
+    environment:
+      - cluster.name=tags-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /data/elastic/master:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - isolatedNetwork
+  elasticsearch_slave:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.5.4
+    container_name: elasticsearch_slave
+    environment:
+      - cluster.name=tags-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.zen.ping.unicast.hosts=elasticsearch_master"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /data/elastic/slave:/usr/share/elasticsearch/data
+    networks:
+      - isolatedNetwork
+
+networks:
+  isolatedNetwork:
+    name: isolatedNetwork
+

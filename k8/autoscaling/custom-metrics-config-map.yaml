@@ -1,0 +1,37 @@
+rules:
+- seriesQuery: 'container_network_receive_packets_total{namespace!="",pod_name!=""}'
+  resources:
+    overrides:
+      namespace: {resource: "namespace"}
+      pod_name: {resource: "pod"}
+  name:
+    matches: "^(.*)"
+    as: "pps1m"
+  metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[1m])) by (<<.GroupBy>>)'
+- seriesQuery: 'container_network_receive_packets_total{namespace!="",pod_name!=""}'
+  resources:
+    overrides:
+      namespace: {resource: "namespace"}
+      pod_name: {resource: "pod"}
+  name:
+    matches: "^(.*)"
+    as: "pps20m"
+  metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[20m])) by (<<.GroupBy>>)'
+- seriesQuery: 'section_http_request_count_total{namespace!="",pod_name!=""}'
+  resources:
+    overrides:
+      namespace: {resource: "namespace"}
+      pod_name: {resource: "pod"}
+  name:
+    matches: "^(.*)"
+    as: "rps10m"
+  metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[10m])) by (<<.GroupBy>>)'
+- seriesQuery: 'section_http_request_count_total{namespace!="",pod_name!=""}'
+  resources:
+    overrides:
+      namespace: {resource: "namespace"}
+      pod_name: {resource: "pod"}
+  name:
+    matches: "^(.*)"
+    as: "rps1m"
+  metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[1m])) by (<<.GroupBy>>)'

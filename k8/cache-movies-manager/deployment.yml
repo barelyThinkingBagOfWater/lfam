@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cache-movies-manager-deployment
+  labels:
+    service: cache-movies-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: cache-movies-manager
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /actuator/prometheus
+        prometheus.io/port: '80'
+      labels:
+        service: cache-movies-manager
+    spec:
+      containers:
+      - name: cache-movies-manager
+        image: localhost:5000/cache-movies-manager
+        imagePullPolicy: Always
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 80
+          periodSeconds: 2
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+            #limits:
+            #cpu: 250m
+            #memory: 512Mi
+        env:
+        - name: IMPORTER_REST_URI
+          valueFrom:
+            configMapKeyRef:
+              name: cache-movies-manager-config
+              key: importer.rest.uri
+        - name: SPRING_REDIS_SINGLE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: cache-movies-manager-config
+              key: spring.redis.single.url
+        - name: SPRING_REDIS_CLUSTER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: cache-movies-manager-config
+              key: spring.redis.cluster.url
+        - name: SPRING_REDIS_NODES_NUMBER
+          valueFrom:
+            configMapKeyRef:
+              name: cache-movies-manager-config
+              key: spring.redis.nodes.number
+        - name: SPRING_RABBITMQ_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cache-movies-manager-config
+              key: spring.rabbitmq.host
+        - name: SPRING_RABBITMQ_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-secrets
+              key: rabbit-user
+        - name: SPRING_RABBITMQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-secrets
+              key: rabbit-password
+        - name: KEYCLOAK_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-config
+              key: keycloak.host
+        - name: KEYCLOAK_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-secret
+              key: keycloak.secret

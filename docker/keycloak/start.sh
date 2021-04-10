@@ -1,0 +1,1 @@
+docker run --rm -p 8080:8080 -p 8443:8443 --name keycloak --network isolatedNetwork -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin -e DB_VENDOR=h2 -e KEYCLOAK_IMPORT=/tmp/realm-export.json -e KEYCLOAK_LOGLEVEL=DEBUG -v $PWD/realm-export.json:/tmp/realm-export.json quay.io/keycloak/keycloak:12.0.3

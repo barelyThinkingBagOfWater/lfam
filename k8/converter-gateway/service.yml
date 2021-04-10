@@ -1,0 +1,15 @@
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: converter-gateway-service
+      labels:
+        service: converter-gateway
+    spec:
+      selector:
+        service: converter-gateway
+      ports:
+      - port: 80 
+        name: http
+      - port: 8000
+        name: prometheus
+      type: NodePort

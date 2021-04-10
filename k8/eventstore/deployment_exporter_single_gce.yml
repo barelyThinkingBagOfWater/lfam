@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eventstore-prometheus-exporter-deployment
+  labels:
+    service: eventstore-prometheus-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: eventstore-prometheus-exporter
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: '/metrics'
+        prometheus.io/port: '9448'
+      labels:
+        service: eventstore-prometheus-exporter
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: security
+                operator: In
+                values:
+                - dmz
+      containers:
+      - name: eventstore-prometheus-exporter
+        image: marcinbudny/eventstore_exporter:0.9.0 #:latest had problems registry-side
+        imagePullPolicy: IfNotPresent
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 9448
+          periodSeconds: 5
+        ports:
+        - containerPort: 9448
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        env:
+        - name: EVENTSTORE_URL
+          value: http://eventstore-service:2113
+        - name: CLUSTER_MODE
+          value: "single"
+        - name: EVENTSTORE_USER
+          valueFrom:
+            secretKeyRef:
+              name: eventstore-secrets
+              key: eventstore-user
+        - name: EVENTSTORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: eventstore-secrets
+              key: eventstore-password

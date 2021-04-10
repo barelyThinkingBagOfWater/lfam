@@ -1,0 +1,5 @@
+apiVersion: v2
+name: cache-tags-chart
+description: A k8 chart for the cache of tags including the dedicated ElasticSearch cluster 
+version: 1.0.0
+type: application

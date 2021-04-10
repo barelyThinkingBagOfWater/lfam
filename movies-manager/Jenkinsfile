@@ -1,0 +1,61 @@
+pipeline {
+    agent 'any'
+
+    stages {
+        stage('Prepare environment') {
+            steps {
+                script {
+                    env.JAVA_HOME = "/opt/jdk-13.0.2"
+                    privateRegistry = "10.244.0.1:5000"
+                    imageName = privateRegistry + "/" + readMavenPom().getArtifactId()
+                }
+            }
+        }
+
+        stage('Build and tests') {
+            steps {
+                sh 'mvn --batch-mode -V -U -e clean verify'
+            }
+        }
+
+        stage('Static code analysis') {
+            steps {
+                sh 'mvn --batch-mode -V -U -e checkstyle:checkstyle pmd:pmd pmd:cpd spotbugs:spotbugs'
+            }
+        }
+
+        stage('SonarQube analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'sonar';
+                    withSonarQubeEnv('sonar') {
+                        sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.7.0.1746:sonar'
+                    }
+                }
+            }
+        }
+
+        stage('Create and push docker image') {
+            steps {
+                script {
+                    docker.withRegistry("http://${privateRegistry}", null) {
+                        def customImage = docker.build(imageName)
+                        customImage.push()
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            junit testResults: '**/target/surefire-reports/TEST-*.xml'
+
+            recordIssues enabledForFailure: true, tools: [mavenConsole(), java(), javaDoc()]
+            recordIssues enabledForFailure: true, tool: checkStyle()
+            recordIssues enabledForFailure: true, tool: spotBugs()
+            recordIssues enabledForFailure: true, tool: cpd(pattern: '**/target/cpd.xml')
+            recordIssues enabledForFailure: true, tool: pmdParser(pattern: '**/target/pmd.xml')
+        }
+    }
+}

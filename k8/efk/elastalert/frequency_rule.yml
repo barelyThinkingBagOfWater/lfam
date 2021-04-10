@@ -1,0 +1,16 @@
+es_host: http://elk-es-service
+es_port: 9200
+name: Example frequency rule
+type: frequency
+index: logstash-*
+num_events: 50
+timeframe:
+    hours: 4
+filter: #[]
+- term:
+    kubernetes.container_name: "movies-manager"
+alert:
+- "email"
+email:
+- "fakeopsteam@domain.com"
+

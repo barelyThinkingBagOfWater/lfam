@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: lfam-certificate
+spec:
+  secretName: lfam-secret
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+  commonName: letsfindamovie.com
+  dnsNames:
+  - letsfindamovie.com
+  - www.letsfindamovie.com

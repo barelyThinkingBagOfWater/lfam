@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cache-tags-manager-deployment
+  labels:
+    service: cache-tags-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: cache-tags-manager
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /actuator/prometheus
+        prometheus.io/port: '80'
+      labels:
+        service: cache-tags-manager
+    spec:
+      containers:
+      - name: cache-tags-manager
+        image: localhost:5000/cache-tags-manager
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: "/etc/certificates"
+          name: certificate
+          readOnly: true
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 80
+          periodSeconds: 2
+        ports:
+        - containerPort: 80
+          #resources:
+           #requests:
+            #cpu: 250m
+            #memory: 512Mi
+            #limits:
+            #cpu: 250m
+            #memory: 512Mi
+        env:
+        - name: TRUST_STORE
+          value: "/etc/certificates/keystore.p12"
+        - name: IMPORTER_REST_URI
+          valueFrom:
+            configMapKeyRef:
+              name: cache-tags-manager-config
+              key: importer.rest.uri
+        - name: ELASTIC_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cache-tags-manager-config
+              key: elastic.host
+        - name: SPRING_RABBITMQ_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cache-tags-manager-config
+              key: spring.rabbitmq.host
+        - name: SPRING_RABBITMQ_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-secrets
+              key: rabbit-user
+        - name: SPRING_RABBITMQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-secrets
+              key: rabbit-password
+        - name: MANAGER_IMPORTS_LOGGING_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: cache-tags-manager-config
+              key: imports.logging
+        - name: KEYCLOAK_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-config
+              key: keycloak.host
+        - name: KEYCLOAK_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-secret
+              key: keycloak.secret
+      volumes:
+      - name: certificate
+        secret:
+          secretName: movies-manager-secrets

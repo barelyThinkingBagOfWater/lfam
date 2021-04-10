@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cache-movies-manager-config
+data:
+  importer.rest.uri: https://movies-manager-from-dmz-service
+  spring.rabbitmq.host: rabbit-service
+  spring.redis.cluster.url: redis-cluster-{id}.redis-cluster-service.default.svc.cluster.local
+  spring.redis.single.url: redis-service
+  spring.redis.nodes.number: "1"

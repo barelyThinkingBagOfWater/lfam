@@ -1,0 +1,13 @@
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: cache-movies-manager-service
+      labels:
+        service: cache-movies-manager
+    spec:
+      selector:
+        service: cache-movies-manager
+      ports:
+      - port: 80 
+        name: http
+      type: NodePort

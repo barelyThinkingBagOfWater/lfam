@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+  namespace: internal
+  labels:
+    service: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: mongo
+  template:
+    metadata:
+      labels:
+        service: mongo
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: mongo
+        image: mongo:4
+        ports:
+        - containerPort: 27017
+          name: http
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        volumeMounts:
+          - name: initscript-configmap-volume
+            mountPath: /docker-entrypoint-initdb.d/
+      volumes:
+      - name: initscript-configmap-volume
+        configMap:
+          name: initscript-configmap
+

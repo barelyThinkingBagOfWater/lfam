@@ -1,0 +1,33 @@
+version: "3.6"
+services:
+  prom:
+    image: prom/prometheus
+    container_name: prometheus-main
+    volumes:
+     - ${PWD}/prometheus.yml:/etc/prometheus/prometheus.yml
+    command: "--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus"
+    networks:
+     - isolatedNetwork
+    depends_on:
+     - exporter
+
+  exporter:
+    image: prom/node-exporter
+    container_name: prometheus-local-metrics-exporter
+    networks:
+     - isolatedNetwork
+
+  grafana:
+    image: grafana/grafana
+    container_name: prometheus-grafana
+    networks:
+     - isolatedNetwork
+    volumes:
+     - /data/grafana/:/var/lib/grafana/
+    depends_on:
+     - prom
+
+networks:
+  isolatedNetwork:
+    name: isolatedNetwork
+

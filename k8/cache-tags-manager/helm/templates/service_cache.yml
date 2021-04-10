@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cache-tags-manager-service
+  labels:
+    service: cache-tags-manager
+spec:
+  selector:
+    service: cache-tags-manager
+  ports:
+  - port: 80
+    name: http 
+  type: LoadBalancer

@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: "tags-cache-manager-virtual-service"
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - tags-cache-manager-gateway
+  http:
+  - match:
+    - uri:
+        exact: /tags-cache-manager
+    route:
+    - destination:
+        host: "tags-cache-manager-service"
+        port:
+          number: 80
+

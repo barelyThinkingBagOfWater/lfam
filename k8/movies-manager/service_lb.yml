@@ -1,0 +1,14 @@
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: movies-manager-service-lb
+      namespace: internal
+      labels:
+        service: movies-manager
+    spec:
+      selector:
+        service: movies-manager
+      ports:
+      - port: 443 
+        name: https
+      type: LoadBalancer

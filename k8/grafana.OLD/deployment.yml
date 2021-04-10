@@ -1,0 +1,52 @@
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: grafana-server
+      namespace: monitoring
+      labels: 
+        service: grafana
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: grafana-server
+          service: grafana
+      template:
+        metadata:
+          annotations:
+            prometheus.io/scrape: 'true'
+            prometheus.io/port: '3000'
+            prometheus.io/path: '/metrics'
+          labels:
+            app: grafana-server
+            service: grafana
+        spec:
+          containers:
+            - name: grafana
+              image: grafana/grafana:7.2.0
+              ports:
+                - containerPort: 3000
+              resources:
+                limits:
+                  memory: 512Mi
+                  cpu: 250m
+                requests:
+                  memory: 512Mi
+                  cpu: 250m
+              volumeMounts:
+              - mountPath: /var/lib/grafana
+                name: grafana-storage
+              - mountPath: /etc/grafana/provisioning
+                name: grafana-provisioning
+              - mountPath: /etc/grafana/
+                name: custom-config-grafana-configmap-volume
+          volumes:
+          - name: grafana-storage
+            emptyDir: {}
+          - name: grafana-provisioning
+            hostPath:
+              path: /home/xavier/workspace/k8/grafana/provisioning
+              type: Directory
+          - name: custom-config-grafana-configmap-volume
+            configMap:
+              name: custom-config-grafana-configmap

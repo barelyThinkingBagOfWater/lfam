@@ -1,0 +1,2 @@
+cd cluster &&
+	./start.sh

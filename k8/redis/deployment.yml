@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+  labels:
+    service: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: redis
+  template:
+    metadata:
+      labels:
+        service: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:6
+        command:
+        - redis-server
+        - "/usr/local/etc/redis/redis.conf"
+        ports:
+        - containerPort: 6379
+          name: tcp
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi   
+          limits:
+            cpu: 250m
+            memory: 512Mi
+        volumeMounts:
+        - mountPath: /usr/local/etc/redis
+          name: config
+         
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: redis-conf-configmap
+          items:
+          - key: redis.conf
+            path: redis.conf

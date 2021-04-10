@@ -1,0 +1,14 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# https://www.playframework.com/documentation/latest/ScalaRouting
+# ~~~~
+
+#Business operations
+GET     /api/rating/:movieId/:userId    controllers.RatingsController.getRatingsOfUserForMovie(movieId, userId)
+GET     /api/rating/:movieId            controllers.RatingsController.getRatingForMovie(movieId)
+
+
+#Technical operations
+GET     /readiness                  controllers.TechnicalController.isCacheReady
+GET     /cache/refresh              controllers.TechnicalController.refreshCache
+GET     /metrics                    controllers.TechnicalController.checkMetrics

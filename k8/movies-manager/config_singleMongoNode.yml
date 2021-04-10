@@ -1,0 +1,11 @@
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+     name: movies-manager-config
+     namespace: internal
+    data:
+      mongodb.host: mongo-service
+      mongodb.nodes.number: "1"
+      spring.rabbitmq.host: rabbit-service-from-internal-service
+      mongodb.replicaSet: ""
+      imports.logging: "false"

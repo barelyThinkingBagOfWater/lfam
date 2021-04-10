@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: converter-gateway-deployment
+  labels:
+    service: converter-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: converter-gateway
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /
+        prometheus.io/port: '8000'
+      labels:
+        service: converter-gateway
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: security
+                operator: In
+                values:
+                - dmz
+    spec:
+      containers:
+      - name: converter-gateway
+        image: xbarrelet/converter-gateway:1.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        env:
+        - name: RABBIT_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: converter-gateway-config
+              key: rabbit.host
+        - name: RABBIT_USER
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-secrets
+              key: rabbit-user
+        - name: RABBIT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-secrets
+              key: rabbit-password

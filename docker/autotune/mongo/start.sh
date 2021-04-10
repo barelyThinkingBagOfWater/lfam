@@ -1,0 +1,1 @@
+docker build -t quotes-mongo . && docker run --rm -d --name quotes-mongo --network isolatedNetwork -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=toor -e MONGO_INITDB_DATABASE=quotes quotes-mongo

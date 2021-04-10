@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: lfam-ip
+spec:
+  rules:
+   - http:
+       paths:
+        - path: /tags/*
+          backend:
+              serviceName: cache-tags-manager-service
+              servicePort: 80
+        - path: /movies*
+          backend:
+              serviceName: cache-movies-manager-service
+              servicePort: 80
+        - path: /rating/*
+          backend:
+              serviceName: cache-ratings-manager-service
+              servicePort: 80
+        - path: /*
+          backend:
+              serviceName: webapp-service
+              servicePort: 80
+#No slot available for the converter-gateway or grafana, limitation by GKE. Use Nginx instead

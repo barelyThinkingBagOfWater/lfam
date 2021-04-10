@@ -1,0 +1,1 @@
+cd efk && ./start.sh

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eventstore-deployment
+spec:
+  selector:
+    matchLabels:
+      service: eventstore
+  replicas: 1   
+  template:
+    metadata:
+      labels:
+        service: eventstore
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: security
+                operator: In
+                values:
+                - dmz
+      containers:
+      - name: eventstore
+        image: eventstore/eventstore:release-5.0.9
+        ports: 
+        - containerPort: 2113
+          name: eventstore-web
+        - containerPort: 1113
+          name: eventstore-tcp
+        - containerPort: 2112
+          name: gossip
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 2113
+          initialDelaySeconds: 30
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 2113
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: 512Mi
+            cpu: 500m 
+          limits:
+            cpu: 500m
+            memory: 1Gi

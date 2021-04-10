@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-sonar-deployment
+  labels:
+    service: postgres-sonar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: postgres-sonar
+  template:
+    metadata:
+      labels:
+        service: postgres-sonar
+    spec:
+      containers:
+      - name: postgres-sonar
+        image: postgres:12.1 #there is an alpine version btw
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5432
+          name: postgres-port
+        env:
+        - name: POSTGRES_USER
+          value: sonar
+        - name: POSTGRES_PASSWORD
+          value: sonar123
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+          - name: sonar-postgres-volume
+            mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: sonar-postgres-volume
+          persistentVolumeClaim:
+            claimName: sonar-pvc

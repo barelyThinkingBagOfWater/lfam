@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch-data-deployment
+  labels:
+    service: elasticsearch-data
+spec:
+  replicas: {{ .Values.dataNodes | default 2 }}
+  selector:
+    matchLabels:
+      service: elasticsearch-data
+  template:
+    metadata:
+      labels:
+        service: elasticsearch-data
+    spec:
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.9.2
+        ports:
+        - containerPort: 9200
+          name: http
+        - containerPort: 9300
+          name: tcp
+        resources:
+          requests:
+            memory: 1280Mi
+            cpu: 500m
+          limits:
+            cpu: 1000m
+            memory: 1280Mi
+        env:
+        - name: cluster.name
+          value: "tags-cluster"
+        - name: node.master
+          value: "false"
+        - name: node.data
+          value: "true"
+        - name: node.ingest
+          value: "false"
+        - name: cluster.remote.connect
+          value: "false"
+        - name: cluster.initial_master_nodes
+          value: "es-master-service"
+        - name: discovery.seed_hosts
+          value: "es-master-service"
+      initContainers:
+      - name: increase-the-vm-max-map-count
+        image: busybox
+        command:
+        - sysctl
+        - -w
+        - vm.max_map_count=262144
+        securityContext:
+          privileged: true
+      - name: increase-the-ulimit
+        image: busybox
+        command:
+        - sh
+        - -c
+        - ulimit -n 65536

@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbit-service
+  labels:
+    service: rabbit
+spec:
+  selector:
+    service: rabbit
+  ports:
+  - port: 5672
+    name: tcp
+  - port: 15672
+    name: admin
+  clusterIP: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbit-service-from-internal-service
+  namespace: internal
+  labels:
+    service: rabbit
+spec:
+  ports:
+  - port: 5672
+    name: tcp
+  - port: 15672
+    name: admin
+  type: ExternalName
+  externalName: rabbit-service.default.svc.cluster.local
+

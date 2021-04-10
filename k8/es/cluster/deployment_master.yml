@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch-master-deployment
+  labels:
+    service: elasticsearch-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: elasticsearch-master
+  template:
+    metadata:
+      labels:
+        service: elasticsearch-master
+    spec:
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.9.2
+        ports:
+        - containerPort: 9200
+          name: http
+        - containerPort: 9300
+          name: tcp
+        resources:
+          requests:
+            memory: 1280Mi
+            cpu: 500m
+          limits:
+            cpu: 1000m
+            memory: 1280Mi
+        env:
+        - name: cluster.name
+          value: "tags-cluster"
+        - name: node.master
+          value: "true"
+        - name: node.data
+          value: "false"
+        - name: node.ingest
+          value: "false"
+        - name: cluster.remote.connect
+          value: "false"
+        - name: cluster.initial_master_nodes
+          value: "es-master-service"
+        - name: node.name
+          value: es-master-service
+        - name: discovery.seed_hosts
+          value: elasticsearch-service
+      initContainers:
+      - name: increase-the-vm-max-map-count
+        image: busybox
+        command:
+        - sysctl
+        - -w
+        - vm.max_map_count=262144
+        securityContext:
+          privileged: true
+      - name: increase-the-ulimit
+        image: busybox
+        command:
+        - sh
+        - -c
+        - ulimit -n 65536

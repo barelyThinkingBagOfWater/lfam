@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+  labels:
+    service: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: mongo
+  template:
+    metadata:
+      labels:
+        service: mongo
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: mongo
+        image: mongo:4
+        args:
+          - --config
+          - /etc/mongo/mongod.conf
+        ports:
+        - containerPort: 27017
+          name: http
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        volumeMounts:
+          - name: initscript-configmap-volume
+            mountPath: /docker-entrypoint-initdb.d/
+          - name: ssl-config
+            mountPath: /etc/mongo
+          - name: ssl-certs
+            mountPath: /etc/ssl        
+      volumes:
+      - name: initscript-configmap-volume
+        configMap:
+          name: initscript-configmap
+      - name: ssl-config
+        configMap:
+          name: ssl-mongo-config
+      - name: ssl-certs
+        secret:
+          secretName: ssl-mongo-secrets
+

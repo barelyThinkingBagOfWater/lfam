@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-deployment
+  labels:
+    service: webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: webapp
+  template:
+    metadata:
+            # annotations:
+            #  prometheus.io/scrape: 'true'
+            #  prometheus.io/path: /actuator/prometheus
+            # prometheus.io/port: '80'
+      labels:
+        service: webapp
+    spec:
+      containers:
+      - name: webapp
+        image: localhost:5000/movies-explorer-webapp
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        volumeMounts:
+          - name:  webapp-config-volume
+            mountPath: /usr/share/nginx/html/external-config.js
+            subPath: config.js
+            readOnly: true
+      volumes:
+        - name: webapp-config-volume
+          configMap:
+            name: webapp-config
