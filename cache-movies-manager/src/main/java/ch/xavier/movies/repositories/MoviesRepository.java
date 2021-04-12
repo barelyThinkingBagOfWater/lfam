@@ -13,7 +13,7 @@ import java.util.List;
 
 
 @Singleton
-public class RedisMoviesRepository {
+public class MoviesRepository {
 
     @Inject
     private RedisReactiveCommands<String, Movie> reactiveRedisOperations;
