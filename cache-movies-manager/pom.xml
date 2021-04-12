@@ -45,21 +45,34 @@
             <artifactId>micronaut-http-server-netty</artifactId>
             <scope>compile</scope>
         </dependency>
+
+
         <dependency>
             <groupId>io.micronaut.rabbitmq</groupId>
             <artifactId>micronaut-rabbitmq</artifactId>
             <scope>compile</scope>
         </dependency>
+
+
         <dependency>
             <groupId>io.micronaut.cache</groupId>
             <artifactId>micronaut-cache-caffeine</artifactId>
             <scope>compile</scope>
         </dependency>
+
+
         <dependency>
             <groupId>io.micronaut.redis</groupId>
             <artifactId>micronaut-redis-lettuce</artifactId>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>io.micronaut.reactor</groupId>
+            <artifactId>micronaut-reactor-http-client</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -120,9 +133,15 @@
             <artifactId>snappy-java</artifactId>
             <version>1.1.8.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.6</version>
+        </dependency>
     </dependencies>
 
     <build>
+        <finalName>${artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>io.micronaut.build</groupId>
@@ -134,8 +153,7 @@
                 <configuration>
                     <!-- Uncomment to enable incremental compilation -->
                     <!-- <useIncrementalCompilation>false</useIncrementalCompilation> -->
-
-                    <annotationProcessorPaths combine.self="override">
+                    <annotationProcessorPaths combine.children="append">
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>

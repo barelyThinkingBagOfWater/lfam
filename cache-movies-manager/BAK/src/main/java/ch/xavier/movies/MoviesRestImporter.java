@@ -12,8 +12,6 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty("importer.rest.uri")
 public class MoviesRestImporter implements EntitiesImporter<Movie> {
 
-    @Autowired
-    private WebClient client;
 
 
     private Flux<Movie> getMovies() {
