@@ -48,12 +48,6 @@ public class RedisConfiguration {
             RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration();
             List<RedisNode> redisNodes = new ArrayList<>(nodesNumber);
 
-            //For Fahrad
-            LettuceClientConfiguration clientConfiguration = LettuceClientConfiguration
-                    .builder()
-                    .readFrom(ReadFrom.REPLICA_PREFERRED)
-                    .build();
-
             Flux.range(0, nodesNumber).doOnNext(nodesNumber -> redisNodes.add(
                     new RedisNode(redisClusterUrl.replace(ID_TEMPLATE, String.valueOf(nodesNumber)), DEFAULT_PORT)))
                     .subscribe();

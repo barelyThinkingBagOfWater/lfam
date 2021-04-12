@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: ch.xavier
+testFramework: junit
+sourceLanguage: java
+buildTool: maven
+features: [annotation-api, app-name, cache-caffeine, http-client, java, java-application, junit, logback, lombok, management, maven, micrometer, micrometer-prometheus, netty-server, rabbitmq, readme, redis-lettuce, shade, yaml]
