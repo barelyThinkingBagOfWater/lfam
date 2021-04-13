@@ -6,15 +6,12 @@ import io.micronaut.context.annotation.Value;
 import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.reactor.http.client.ReactorHttpClient;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.List;
 
 @Singleton
-@Slf4j
 public class MoviesRestImporter implements EntitiesImporter<Movie> {
 
     @Value("${importer.rest.uri}")

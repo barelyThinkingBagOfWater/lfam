@@ -13,7 +13,7 @@ spec:
     metadata:
       annotations:
         prometheus.io/scrape: 'true'
-        prometheus.io/path: /actuator/prometheus
+        prometheus.io/path: /prometheus
         prometheus.io/port: '80'
       labels:
         service: cache-movies-manager
@@ -42,32 +42,37 @@ spec:
             configMapKeyRef:
               name: cache-movies-manager-config
               key: importer.rest.uri
-        - name: SPRING_REDIS_SINGLE_URL
+        - name: REDIS_SINGLE_URL
           valueFrom:
             configMapKeyRef:
               name: cache-movies-manager-config
-              key: spring.redis.single.url
-        - name: SPRING_REDIS_CLUSTER_URL
+              key: redis.single.url
+        - name: REDIS_URI
           valueFrom:
             configMapKeyRef:
               name: cache-movies-manager-config
-              key: spring.redis.cluster.url
-        - name: SPRING_REDIS_NODES_NUMBER
+              key: redis.single.url
+        - name: REDIS_CLUSTER_URL
           valueFrom:
             configMapKeyRef:
               name: cache-movies-manager-config
-              key: spring.redis.nodes.number
-        - name: SPRING_RABBITMQ_HOST
+              key: redis.cluster.url
+        - name: REDIS_NODES_NUMBER
           valueFrom:
             configMapKeyRef:
               name: cache-movies-manager-config
-              key: spring.rabbitmq.host
-        - name: SPRING_RABBITMQ_USERNAME
+              key: redis.nodes.number
+        - name: RABBITMQ_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cache-movies-manager-config
+              key: rabbitmq.host
+        - name: RABBITMQ_USERNAME
           valueFrom:
             secretKeyRef:
               name: rabbit-secrets
               key: rabbit-user
-        - name: SPRING_RABBITMQ_PASSWORD
+        - name: RABBITMQ_PASSWORD
           valueFrom:
             secretKeyRef:
               name: rabbit-secrets

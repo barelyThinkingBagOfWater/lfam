@@ -63,11 +63,10 @@ echo
 echo 
 print "Now starting the monitoring system in namespace monitoring." 
 echo 
-#./start_monitoring.sh
+./start_monitoring.sh
 
-startComponentWithCurrentMode "prometheus" 
-startComponentWithCurrentMode "grafana" 
-#startComponentWithCurrentMode "keycloak" #not yet with google cloud, to implement after current job
+startComponentWithCurrentMode "keycloak" #not yet with google cloud, to implement after current job
+sleep 20 &&
 startComponentWithCurrentMode "rabbit" 
 startComponentWithCurrentMode "mongo" 
 startComponentWithCurrentMode "movies-manager"
