@@ -16,8 +16,8 @@ public class SecurityContext {
         http
                 .authorizeExchange(exchanges -> exchanges
                         //Restricted to movies:import
-//                        .pathMatchers("/movies", "/ratings")
-//                        .hasAuthority("SCOPE_movies:import")
+                        .pathMatchers("/movies", "/ratings")
+                        .hasAuthority("SCOPE_movies:import")
 
                         //Unrestricted
                         .pathMatchers("/readiness")
@@ -25,8 +25,7 @@ public class SecurityContext {
 
                         //Fallback
                         .anyExchange()
-                        .permitAll()
-//                        .authenticated()
+                        .authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(withDefaults())

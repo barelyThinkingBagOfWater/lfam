@@ -12,10 +12,11 @@ spec:
       service: movies-manager
   template:
     metadata:
-      annotations:
-        prometheus.io/scrape: 'true'
-        prometheus.io/path: /actuator/prometheus
-        prometheus.io/port: '8080'
+    #Don't work with oauth2 online
+      #annotations:
+      #  prometheus.io/scrape: 'true'
+      #  prometheus.io/path: /actuator/prometheus
+      #  prometheus.io/port: '8080'
       labels:
         service: movies-manager
     spec:
@@ -23,12 +24,12 @@ spec:
       - name: movies-manager
         image: localhost:5000/movies-manager
         imagePullPolicy: Always
-        readinessProbe:
-          httpGet:
-            path: /readiness
-            port: 443
-            scheme: HTTPS
-          periodSeconds: 2
+        #readinessProbe:
+        #  httpGet:
+        #    path: /readiness
+        #    port: 443
+        #    scheme: HTTPS
+        #  periodSeconds: 2
         ports:
         - containerPort: 80
           #resources:
