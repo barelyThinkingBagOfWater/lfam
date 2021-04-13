@@ -47,11 +47,6 @@ spec:
             configMapKeyRef:
               name: cache-movies-manager-config
               key: redis.single.url
-        - name: REDIS_URI
-          valueFrom:
-            configMapKeyRef:
-              name: cache-movies-manager-config
-              key: redis.single.url
         - name: REDIS_CLUSTER_URL
           valueFrom:
             configMapKeyRef:
