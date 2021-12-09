@@ -1,4 +1,4 @@
-The components of the website letsfindamovie.com that uses a CQRS architecture and everything is reactive. Made of:
+The components of the website letsfindamovie.com that uses a CQRS architecture and everything is reactive and hosted in a Kubernetes cluster. Made of:
   - movies-manager : Source of truth of the system that loads from csv files the movies, tags and ratings and serves them to all the caches
   - converter-gateway: Converts rest calls to events propagated within the system to add tags and ratings to movies in all components, written in async Python with Aiohttp
   - cache-tags-manager : reactive cache of tags using ElasticSearch as a datastore
